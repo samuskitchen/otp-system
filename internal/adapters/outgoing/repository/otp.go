@@ -65,6 +65,7 @@ func (or *otpRepository) InsertBlackList(ctx context.Context, clientID, phoneNum
 		ClientID:    clientID,
 		PhoneNumber: phoneNumber,
 		BlockedAt:   dueDate,
+		IsActive:    true,
 	}
 
 	result, err := collection.InsertOne(ctx, createBlacklist)
@@ -99,7 +100,7 @@ func (or *otpRepository) CheckBlacklist(ctx context.Context, phoneNumber string)
 	log.Info().Msg("implement Repository CheckBlacklist")
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginBlackListOTP)
 
-	count, err := collection.CountDocuments(ctx, bson.M{"phone_number": phoneNumber})
+	count, err := collection.CountDocuments(ctx, bson.M{"phone_number": phoneNumber, "is_active": true})
 	return count > 0, err
 }
 

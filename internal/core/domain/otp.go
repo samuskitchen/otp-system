@@ -37,6 +37,7 @@ type Blacklist struct {
 	ClientID    string             `bson:"client_id"`
 	PhoneNumber string             `bson:"phone_number"`
 	BlockedAt   string             `bson:"blocked_at"`
+	IsActive    bool               `bson:"is_active"`
 }
 
 type FailedAttempts struct {
