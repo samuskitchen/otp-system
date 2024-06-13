@@ -56,7 +56,7 @@ func (or *otpRepository) InsertOTP(ctx context.Context, clientID, phoneNumber, c
 }
 
 func (or *otpRepository) InsertBlackList(ctx context.Context, clientID, phoneNumber string) (domain.Blacklist, error) {
-	log.Info().Msg("implement Insert")
+	log.Info().Msg("implement Repository InsertBlackList")
 
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginBlackListOTP)
 
@@ -77,7 +77,7 @@ func (or *otpRepository) InsertBlackList(ctx context.Context, clientID, phoneNum
 }
 
 func (or *otpRepository) FindOTP(ctx context.Context, phoneNumber, code string) (*domain.OTP, error) {
-	log.Info().Msg("implement FindOTP")
+	log.Info().Msg("implement Repository FindOTP")
 	var otp domain.OTP
 
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginLogOTP)
@@ -87,7 +87,7 @@ func (or *otpRepository) FindOTP(ctx context.Context, phoneNumber, code string) 
 }
 
 func (or *otpRepository) UpdateOTP(ctx context.Context, otp *domain.OTP) error {
-	log.Info().Msg("implement UpdateOTP")
+	log.Info().Msg("implement Repository UpdateOTP")
 
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginLogOTP)
 	_, err := collection.UpdateOne(ctx, bson.M{"_id": otp.ID}, bson.M{"$set": otp})
@@ -96,7 +96,7 @@ func (or *otpRepository) UpdateOTP(ctx context.Context, otp *domain.OTP) error {
 }
 
 func (or *otpRepository) CheckBlacklist(ctx context.Context, phoneNumber string) (bool, error) {
-	log.Info().Msg("implement CheckBlacklist")
+	log.Info().Msg("implement Repository CheckBlacklist")
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginBlackListOTP)
 
 	count, err := collection.CountDocuments(ctx, bson.M{"phone_number": phoneNumber})
@@ -104,7 +104,7 @@ func (or *otpRepository) CheckBlacklist(ctx context.Context, phoneNumber string)
 }
 
 func (or *otpRepository) MarkOTPAsObsolete(ctx context.Context, phoneNumber, code string) error {
-	log.Info().Msg("implement MarkOTPAsObsolete")
+	log.Info().Msg("implement Repository MarkOTPAsObsolete")
 
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginLogOTP)
 	_, err := collection.UpdateOne(ctx, bson.M{"phone_number": phoneNumber, "code": code}, bson.M{"$set": bson.M{"obsolete": true}})
@@ -113,7 +113,7 @@ func (or *otpRepository) MarkOTPAsObsolete(ctx context.Context, phoneNumber, cod
 }
 
 func (or *otpRepository) FindFailedAttempt(ctx context.Context, phoneNumber, code string) (*domain.FailedAttempts, error) {
-	log.Info().Msg("implement FindFailedAttempt")
+	log.Info().Msg("implement Repository FindFailedAttempt")
 
 	var failedAttempts domain.FailedAttempts
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginFailedAttemptsOTP)
@@ -124,7 +124,7 @@ func (or *otpRepository) FindFailedAttempt(ctx context.Context, phoneNumber, cod
 }
 
 func (or *otpRepository) LogFailedAttempt(ctx context.Context, clientID, phoneNumber, code string) (int, error) {
-	log.Info().Msg("implement LogFailedAttempt")
+	log.Info().Msg("implement Repository LogFailedAttempt")
 
 	collection := or.mongo.Database(enums.MongodbDatabase).Collection(enums.LoginFailedAttemptsOTP)
 	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)

@@ -29,7 +29,7 @@ func NewOTPService(otpRepository out.OTPRepository) in.OTPService {
 }
 
 func (os *otpService) GenerateOTP(ctx context.Context, data domain.OTPRequest) (domain.OTPResponse, error) {
-	log.Info().Msg("implement GenerateOTP")
+	log.Info().Msg("implement Service GenerateOTP")
 
 	codeOTP, err := generateCodeOTP()
 	if err != nil {
@@ -45,7 +45,7 @@ func (os *otpService) GenerateOTP(ctx context.Context, data domain.OTPRequest) (
 }
 
 func (os *otpService) ValidateOTP(ctx context.Context, data domain.OTPValidateRequest) (bool, error) {
-	log.Info().Msg("implement ValidateOTP")
+	log.Info().Msg("implement Service ValidateOTP")
 
 	otp, err := os.otpRepository.FindOTP(ctx, data.PhoneNumber, data.Code)
 	if err != nil {
@@ -85,8 +85,19 @@ func (os *otpService) ValidateOTP(ctx context.Context, data domain.OTPValidateRe
 }
 
 func (os *otpService) CheckBlacklist(ctx context.Context, dataValidate domain.OTPValidateRequest) (bool, error) {
-	log.Info().Msg("implement CheckBlacklist")
+	log.Info().Msg("implement Service CheckBlacklist")
 	return os.otpRepository.CheckBlacklist(ctx, dataValidate.PhoneNumber)
+}
+
+func (os *otpService) InsertBlackListOTP(ctx context.Context, data domain.OTPRequest) error {
+	log.Info().Msg("implement Service InsertBlackListOTP")
+
+	_, err := os.otpRepository.InsertBlackList(ctx, data.ClientID, data.PhoneNumber)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func generateCodeOTP() (string, error) {

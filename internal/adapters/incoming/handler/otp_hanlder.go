@@ -10,6 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const messageBlackList = "Phone number is blacklisted"
+
 type otpHandler struct {
 	otpService in.OTPService
 }
@@ -17,6 +19,7 @@ type otpHandler struct {
 type OTPHandler interface {
 	RequestOTP(c echo.Context) error
 	VerifyOTP(c echo.Context) error
+	AddBlackListOTP(c echo.Context) error
 }
 
 func NewOTPHandler(otpService in.OTPService) OTPHandler {
@@ -31,6 +34,19 @@ func (oh *otpHandler) RequestOTP(c echo.Context) error {
 	var otpRequest domain.OTPRequest
 	if err := c.Bind(&otpRequest); err != nil {
 		return err
+	}
+
+	otpValidateRequest := domain.OTPValidateRequest{
+		ClientID:    otpRequest.ClientID,
+		PhoneNumber: otpRequest.PhoneNumber,
+	}
+	blacklisted, err := oh.otpService.CheckBlacklist(ctx, otpValidateRequest)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	if blacklisted {
+		return c.JSON(http.StatusForbidden, map[string]string{"message": messageBlackList})
 	}
 
 	otp, err := oh.otpService.GenerateOTP(ctx, otpRequest)
@@ -56,7 +72,7 @@ func (oh *otpHandler) VerifyOTP(c echo.Context) error {
 	}
 
 	if blacklisted {
-		return c.JSON(http.StatusForbidden, map[string]string{"message": "Phone number is blacklisted"})
+		return c.JSON(http.StatusForbidden, map[string]string{"message": messageBlackList})
 	}
 
 	valid, err := oh.otpService.ValidateOTP(ctx, otpValidateRequest)
@@ -69,4 +85,21 @@ func (oh *otpHandler) VerifyOTP(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "OTP verified successfully"})
+}
+
+func (oh *otpHandler) AddBlackListOTP(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var otpRequest domain.OTPRequest
+	if err := c.Bind(&otpRequest); err != nil {
+		return err
+	}
+
+	err := oh.otpService.InsertBlackListOTP(ctx, otpRequest)
+	if err != nil {
+		log.Error().Msg(err.Error())
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": messageBlackList})
 }

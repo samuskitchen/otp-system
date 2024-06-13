@@ -24,4 +24,5 @@ func NewOTPRoute(otpHandler handler.OTPHandler) Route {
 func (or *otpRoute) Resource(c *echo.Group) {
 	c.POST(enums.GenerateOTPPOST, or.otpHandler.RequestOTP)
 	c.POST(enums.ValidateOTPPOST, or.otpHandler.VerifyOTP)
+	c.POST(enums.AddBlackListPOST, or.otpHandler.AddBlackListOTP)
 }

@@ -4,6 +4,7 @@ const (
 	BasePath   string = "/otp-system"
 	HealthPath string = "/health"
 
-	GenerateOTPPOST = "/request-otp"
-	ValidateOTPPOST = "/verify-otp"
+	GenerateOTPPOST  string = "/request-otp"
+	ValidateOTPPOST  string = "/verify-otp"
+	AddBlackListPOST string = "/black-list-otp"
 )
