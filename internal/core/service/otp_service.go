@@ -65,6 +65,10 @@ func (os *otpService) ValidateOTP(ctx context.Context, data domain.OTPValidateRe
 		return false, fmt.Errorf("OTP not found or already used")
 	}
 
+	if otp.Obsolete {
+		return false, fmt.Errorf("OTP obsolete")
+	}
+
 	// Check if OTP is expired
 	if time.Now().After(otp.ExpiresAt) {
 		otp.Obsolete = true
@@ -76,6 +80,7 @@ func (os *otpService) ValidateOTP(ctx context.Context, data domain.OTPValidateRe
 		return false, fmt.Errorf("OTP expired")
 	}
 
+	otp.Attempts++
 	updateErr := os.otpRepository.UpdateOTP(ctx, otp)
 	if updateErr != nil {
 		return false, updateErr
